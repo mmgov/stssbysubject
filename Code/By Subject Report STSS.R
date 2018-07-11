@@ -1,12 +1,12 @@
 # Packages ----------------------------------------------------------------
 library(tidyverse)
-
+library(officer)
 
 
 # Read data ---------------------------------------------------------------
 
   library(readr)
-stss <- read_csv("Data/results-for-sutton-trust-2018-07-10-1343.csv")
+stss <- read_csv("Data/results-for-sutton-trust-2018-07-10-1344.csv")
 
 View(stss)
 #recodes
@@ -74,10 +74,6 @@ a <- rbind(a,data.frame("Var1"="Very Poor","Freq"=0))
 b <- as.data.frame(table(stss$Q6))
 b <- rbind(b,data.frame("Var1"="Very Poor","Freq"=0))
 
-
-
-
-
 c <- a$Freq+b$Freq
 View(c)
 as.data.frame(c)
@@ -95,6 +91,25 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
         names.arg=c$Var1),
      c$pct,labels=paste0(c$pct,"%"),pos=3)
 
+# generate and inset graph
+my_doc <- read_docx() 
+styles_info(my_doc)
+
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=c$Var1),
+     c$pct,labels=paste0(c$pct,"%"),pos=3)
+
+dev.off()
+
+my_doc <- my_doc %>% 
+  body_add_img(src = src, width = 6, height = 4, style = "centered")
+
+
+
 
 
 
@@ -111,20 +126,37 @@ Q14 <- rbind(Q14,data.frame("Var1"="Poor","Freq"=0.0))
 Q14 <- rbind(Q14,data.frame("Var1"="Very Poor","Freq"=0.0))
 
 
-text(barplot(Q15$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
              las=1,
              border=NA,
-             names.arg=c$Var1),
-     Q15$Freq,labels=paste0(Q15$Freq,"%"),pos=3)
+             names.arg=Q14$Var1),
+     Q14$Freq,labels=paste0(Q14$Freq,"%"),pos=3)
+
+
+
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=Q14$Var1),
+     Q14$Freq,labels=paste0(Q14$Freq,"%"),pos=3)
+
+dev.off()
+
+my_doc <- my_doc %>% 
+  body_add_img(src = src, width = 6, height = 4, style = "centered")
+
+
+
+
+
 
 # How would you rate the Academic staff (Main and Second subjects combined)
 
 a <- as.data.frame(table(stss$Q7))
 View(a)
-
-a <- rbind(a,data.frame("Var1"="Poor","Freq"=0))
 a <- rbind(a,data.frame("Var1"="Very Poor","Freq"=0))
-
 
 b <- as.data.frame(table(stss$Q8))
 b <- rbind(b,data.frame("Var1"="Very Poor","Freq"=0))
@@ -147,6 +179,27 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
              border=NA,
              names.arg=c$Var1),
      c$pct,labels=paste0(c$pct,"%"),pos=3)
+
+
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=c$Var1),
+     c$pct,labels=paste0(c$pct,"%"),pos=3)
+
+dev.off()
+
+my_doc <- my_doc %>% 
+  body_add_img(src = src, width = 6, height = 4, style = "centered")
+
+
+print(my_doc, target = "first_example.docx")
+
+
+
+
 
 
 
