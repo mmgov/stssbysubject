@@ -5,9 +5,8 @@ library(officer)
 
 # Read data ---------------------------------------------------------------
 
-  library(readr)
 stss <- read_csv("Data/results-for-sutton-trust-2018-07-10-1344.csv")
-
+View(stss)
 View(stss)
 #recodes
 
@@ -66,18 +65,50 @@ stss$Q32_1_a[stss$Q32_1_a=="4"] <- "NA/Don't know"
 
 View(stss)
 
+#Question Response orders
+
+MLorder <- c("More likely","About the same","Less likely","NA/Don't know")
+EVorder <- c("Excellent","Good","Okay","Poor","Very Poor")
+
+
+#create standard dfs
+
+FreqB <- c(0,0,0,0,0)
+FreqC <- c(0,0,0,0)
+
+EVtable <- data.frame(EVorder,FreqB)
+MLtable <- data.frame(MLorder,FreqC)
+colnames(EVtable) <- c("Var1","FreqB")
+colnames(MLtable) <- c("Var1","FreqB")
+View(EVtable)
+View(MLtable)
 # How would you rate academic sessions (Main and Second subjects combined)
 
 a <- as.data.frame(table(stss$Q5))
-a <- rbind(a,data.frame("Var1"="Very Poor","Freq"=0))
+View(a)
+
+a <- merge(EVtable,
+              a[,c("Var1",
+                   "Freq")],
+              by="Var1",all.x=TRUE)
+
+a[is.na(a)] <- 0
+
 
 b <- as.data.frame(table(stss$Q6))
-b <- rbind(b,data.frame("Var1"="Very Poor","Freq"=0))
+
+b <- merge(EVtable,
+           b[,c("Var1",
+                "Freq")],
+           by="Var1",all.x=TRUE)
+
+b[is.na(b)] <- 0
+
 
 c <- a$Freq+b$Freq
 View(c)
 as.data.frame(c)
-c <- cbind(c,data.frame(c("Excellent","Good","Okay","Poor","Very Poor")))
+c <- cbind(c,data.frame(c(EVorder)))
 colnames(c) <- c("Freq","Var1")
 
 c<-mutate(c,
@@ -92,11 +123,11 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
      c$pct,labels=paste0(c$pct,"%"),pos=3)
 
 # generate and inset graph
-my_doc <- read_docx() 
+my_doc <- read_docx(path = "ISTSS.docx") 
 styles_info(my_doc)
 
 src <- tempfile(fileext = ".png")
-png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
 text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
              las=1,
              border=NA,
@@ -106,9 +137,8 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
 dev.off()
 
 my_doc <- my_doc %>% 
-  body_add_img(src = src, width = 6, height = 4, style = "centered")
-
-
+  body_add_par("Chart 1 Academic sessions", style = "Normal") %>% 
+  body_add_img(src = src, width = 5.86, height = 3)
 
 
 
@@ -118,12 +148,15 @@ View(Q14)
 #group project sessions All Subjects Together
 
 Q14 <- round(prop.table(table(stss$Q14))*100,digits=1)
-
+View(Q14)
 Q14 <- as.data.frame(Q14)
 
-Q14 <- rbind(Q14,data.frame("Var1"="Poor","Freq"=0.0))
+Q14 <- merge(EVtable,
+           Q14[,c("Var1",
+                "Freq")],
+           by="Var1",all.x=TRUE)
 
-Q14 <- rbind(Q14,data.frame("Var1"="Very Poor","Freq"=0.0))
+Q14[is.na(Q14)] <- 0
 
 
 text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
@@ -135,7 +168,7 @@ text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,
 
 
 src <- tempfile(fileext = ".png")
-png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
 text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
              las=1,
              border=NA,
@@ -145,7 +178,8 @@ text(barplot(Q14$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,
 dev.off()
 
 my_doc <- my_doc %>% 
-  body_add_img(src = src, width = 6, height = 4, style = "centered")
+  body_add_par("Chart 2 Group project sessions", style = "Normal") %>%
+  body_add_img(src = src, width = 5.86, height = 3)
 
 
 
@@ -158,8 +192,27 @@ a <- as.data.frame(table(stss$Q7))
 View(a)
 a <- rbind(a,data.frame("Var1"="Very Poor","Freq"=0))
 
+a <- merge(EVtable,
+           a[,c("Var1",
+                "Freq")],
+           by="Var1",all.x=TRUE)
+
+a[is.na(a)] <- 0
+
+
+
+
 b <- as.data.frame(table(stss$Q8))
-b <- rbind(b,data.frame("Var1"="Very Poor","Freq"=0))
+
+b <- merge(EVtable,
+           b[,c("Var1",
+                "Freq")],
+           by="Var1",all.x=TRUE)
+
+b[is.na(b)] <- 0
+
+
+
 View(b)
 
 c <- a$Freq+b$Freq
@@ -182,7 +235,7 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
 
 
 src <- tempfile(fileext = ".png")
-png(filename = src, width = 6, height = 4, units = 'in', res = 300)
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
 text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
              las=1,
              border=NA,
@@ -192,10 +245,8 @@ text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100
 dev.off()
 
 my_doc <- my_doc %>% 
-  body_add_img(src = src, width = 6, height = 4, style = "centered")
-
-
-print(my_doc, target = "first_example.docx")
+  body_add_par("Chart 3 Academic staff", style = "Normal") %>%
+  body_add_img(src = src, width = 5.86, height = 3, style = "Normal")
 
 
 
@@ -211,9 +262,14 @@ Q31 <- as.data.frame(Q31)
 
 View(Q31)
 
-Q31 <- rbind(Q31,data.frame("Var1"="Poor","Freq"=0))
+Q31 <- merge(EVtable,
+             Q31[,c("Var1",
+                    "Freq")],
+             by="Var1",all.x=TRUE)
 
-Q31 <- rbind (Q31,data.frame("Var1"="Very Poor","Freq"=0))
+Q31[is.na(Q31)] <- 0
+
+
 
 
 
@@ -225,11 +281,19 @@ text(barplot(Q31$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,
              names.arg=Q31$Var1),
      Q31$Freq,labels=paste0(Q31$Freq,"%"),pos=3)
 
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
+text(barplot(Q31$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=Q31$Var1),
+     Q31$Freq,labels=paste0(Q31$Freq,"%"),pos=3)
 
+dev.off()
 
-
-
-
+my_doc <- my_doc %>% 
+  body_add_par("Chart 4 Overall, how would you rate the Sutton Trust Summer school at UoE?", style = "Normal") %>%
+  body_add_img(src = src, width = 5.86, height = 3, style = "Normal")
 
 
 # Are you more likely to consider applying to any uni now?
@@ -240,18 +304,48 @@ Q32_2_a <- as.data.frame(Q32_2_a)
 
 View(Q32_2_a)
 
-Q32_2_a <- rbind(Q32_2_a,data.frame("Var1"="NA/Don't know","Freq"=0))
 
-MLorder <- c("More likely","About the same","Less likely","NA/Don't know")
+
+
+Q32_2_a <- merge(MLtable,
+             Q32_2_a[,c("Var1",
+                    "Freq")],
+             by="Var1",all.x=TRUE)
+
+Q32_2_a[is.na(Q32_2_a)] <- 0
+
+
 
 Q32_2_a <- Q32_2_a%>%
   slice(match(MLorder,Var1))
+
+
+View(Q32_2_a)
 
 text(barplot(Q32_2_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
              las=1,
              border=NA,
              names.arg=Q32_2_a$Var1),
      Q32_2_a$Freq,labels=paste0(Q32_2_a$Freq,"%"),pos=3)
+
+
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
+text(barplot(Q32_2_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=Q32_2_a$Var1),
+     Q32_2_a$Freq,labels=paste0(Q32_2_a$Freq,"%"),pos=3)
+
+dev.off()
+
+
+my_doc <- my_doc %>% 
+  body_add_par("Chart 5 Overall, are you more or less likely to consider applying to ANY university now?", style = "Normal") %>%
+  body_add_img(src = src, width = 5.86, height = 3, style = "Normal")
+
+
+
 
 
 # Are you more likely to consider applying to UoE now?
@@ -262,7 +356,13 @@ Q32_1_a <- as.data.frame(Q32_1_a)
 
 View(Q32_1_a)
 
-Q32_1_a <- rbind(Q32_1_a,data.frame("Var1"="NA/Don't know","Freq"=0))
+Q32_1_a <- merge(MLtable,
+                 Q32_1_a[,c("Var1",
+                            "Freq")],
+                 by="Var1",all.x=TRUE)
+
+Q32_1_a[is.na(Q32_1_a)] <- 0
+
 
 Q32_1_a <- Q32_1_a%>%
   slice(match(MLorder,Var1))
@@ -273,6 +373,22 @@ text(barplot(Q32_1_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=
              names.arg=Q32_1_a$Var1),
      Q32_1_a$Freq,labels=paste0(Q32_1_a$Freq,"%"),pos=3)
 
+src <- tempfile(fileext = ".png")
+png(filename = src, width = 5.86, height = 3, units = 'in', res = 300)
+text(barplot(Q32_1_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+             las=1,
+             border=NA,
+             names.arg=Q32_1_a$Var1),
+     Q32_1_a$Freq,labels=paste0(Q32_1_a$Freq,"%"),pos=3)
+
+dev.off()
+
+my_doc <- my_doc %>% 
+  body_add_par("Chart 6 Overall, are you more or less likely to consider applying to UoE now?", style = "Normal") %>%
+  body_add_img(src = src, width = 5.86, height = 3, style = "Normal")
+
+
+print(my_doc, target = "STSS18.docx")
 
 
 # Section 2 Results by subject --------------------------------------------
@@ -286,163 +402,12 @@ table(stss$Q4)
 round(prop.table(table(stss$Q4))*100,digits=1)
 
 
+
+
+
+
+
 #Begin by subject section Biology
-  
-#The Academic Sessions
-#Q7 for those who selected Biology for Q5, Q8 for those who selected Biology for Q6
-
-#make biological sci main subject And second subject ONLY
-
-biomain <- subset(stss, `Q5`== 'Biological Sciences')
-
-biosec <- subset(stss, `Q6` == 'Biological Sciences' )
-
-a <- as.data.frame(table(biomain$Q7))
-b <- as.data.frame(table(biosec$Q8))
-
-c <- a$Freq+b$Freq
-as.data.frame(c)
-c <- cbind(c,data.frame(c("Excellent","Good","Okay")))
-
-colnames(c) <- c("Freq","Var1")
-
-c <- rbind(c,data.frame("Var1"="Poor","Freq"=0))
-c <- rbind(c,data.frame("Var1"="Very Poor","Freq"=0))
-
-c<-mutate(c,
-          pct=(Freq/sum(Freq))*100)
-
-c$pct <- round(c$pct,digits=1)
-
-text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=c$Var1),
-     c$pct,labels=paste0(c$pct,"%"),pos=3)
-
-#Experience of the academic staff
-
-a <- as.data.frame(table(biomain$Q9))
-b <- as.data.frame(table(biosec$Q10))
-
-a <- rbind(a,data.frame("Var1"="Poor","Freq"=0))
-a <- rbind(a,data.frame("Var1"="Very Poor","Freq"=0))
-
-b <- rbind(b,data.frame("Var1"="Very Poor","Freq"=0))
-
-View(c)
-
-c <- a$Freq+b$Freq
-as.data.frame(c)
-c <- cbind(c,data.frame(c("Excellent","Good","Okay","Poor","Very Poor")))
-
-colnames(c) <- c("Freq","Var1")
-
-
-c<-mutate(c,
-          pct=(Freq/sum(Freq))*100)
-
-c$pct <- round(c$pct,digits=1)
-
-text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=c$Var1),
-     c$pct,labels=paste0(c$pct,"%"),pos=3)
-
-
-# The group project sessions
-
-table(biomain$Q15)
-
-Q15 <- (prop.table(table(biomain$Q15))*100)
-
-Q15 <- as.data.frame(Q15)
-
-View(Q15)
-
-Q15 <- rbind(Q15,data.frame("Var1"="Poor","Freq"=0))
-
-Q15 <- rbind (Q15,data.frame("Var1"="Very Poor","Freq"=0))
-
-text(barplot(Q15$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=Q15$Var1),
-     Q15$Freq,labels=paste0(Q15$Freq,"%"),pos=3)
-
-
-#Overall rating 
-
-Q31 <- (prop.table(table(biomain$Q31))*100)
-
-Q31 <- as.data.frame(Q31)
-
-View(Q31)
-
-Q31 <- rbind(Q31,data.frame("Var1"="Okay","Freq"=0))
-
-Q31 <- rbind(Q31,data.frame("Var1"="Poor","Freq"=0))
-
-Q31 <- rbind (Q31,data.frame("Var1"="Very Poor","Freq"=0))
-
-text(barplot(Q31$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=Q31$Var1),
-     Q31$Freq,labels=paste0(Q31$Freq,"%"),pos=3)
-
-
-# Are you more likely to apply to ANY uni
-
-Q32_2_a <- (prop.table(table(biomain$Q32_2_a))*100)
-
-Q32_2_a <- as.data.frame(Q32_2_a)
-
-View(Q32_2_a)
-
-Q32_2_a <- rbind(Q32_2_a,data.frame("Var1"="Less likely","Freq"=0))
-
-Q32_2_a <- rbind(Q32_2_a,data.frame("Var1"="NA/Don't know","Freq"=0))
-
-
-MLorder <- c("More likely","About the same","Less likely","NA/Don't know")
-
-Q32_2_a <- Q32_2_a%>%
-  slice(match(MLorder,Var1))
-  
-
-text(barplot(Q32_2_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=Q32_2_a$Var1),
-     Q32_2_a$Freq,labels=paste0(Q32_2_a$Freq,"%"),pos=3)
-
-
-# Are you more likely to apply to UoE
-
-Q32_1_a <- (prop.table(table(biomain$Q32_1_a))*100)
-
-Q32_1_a <- as.data.frame(Q32_1_a)
-
-View(Q32_1_a)
-
-Q32_1_a <- rbind(Q32_1_a,data.frame("Var1"="NA/Don't know","Freq"=0))
-
-Q32_1_a <- Q32_1_a%>%
-  slice(match(MLorder,Var1))
-
-
-text(barplot(Q32_1_a$Freq, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
-             las=1,
-             border=NA,
-             names.arg=Q32_1_a$Var1),
-     Q32_1_a$Freq,labels=paste0(Q32_1_a$Freq,"%"),pos=3)
-
-
-
-
-
 
 
 
