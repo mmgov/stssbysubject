@@ -1,0 +1,150 @@
+---
+title: "Untitled"
+author: "Matt McGovern"
+date: "10 August 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r a, include = FALSE}
+library(tidyverse)
+stss <- read_csv("Data/results-for-sutton-trust-2018-07-10-1344.csv")
+
+#recodes
+
+stss$Q5[stss$Q5=="5"] <- "Very Poor"
+stss$Q5[stss$Q5=="4"] <- "Poor"
+stss$Q5[stss$Q5=="3"] <- "Okay"
+stss$Q5[stss$Q5=="2"] <- "Good"
+stss$Q5[stss$Q5=="1"] <- "Excellent"
+
+stss$Q6[stss$Q6=="5"] <- "Very Poor"
+stss$Q6[stss$Q6=="4"] <- "Poor"
+stss$Q6[stss$Q6=="3"] <- "Okay"
+stss$Q6[stss$Q6=="2"] <- "Good"
+stss$Q6[stss$Q6=="1"] <- "Excellent"
+
+
+
+stss$Q7[stss$Q7=="5"] <- "Very Poor"
+stss$Q7[stss$Q7=="4"] <- "Poor"
+stss$Q7[stss$Q7=="3"] <- "Okay"
+stss$Q7[stss$Q7=="2"] <- "Good"
+stss$Q7[stss$Q7=="1"] <- "Excellent"
+
+stss$Q8[stss$Q8=="5"] <- "Very Poor"
+stss$Q8[stss$Q8=="4"] <- "Poor"
+stss$Q8[stss$Q8=="3"] <- "Okay"
+stss$Q8[stss$Q8=="2"] <- "Good"
+stss$Q8[stss$Q8=="1"] <- "Excellent"
+
+
+stss$Q14[stss$Q14=="5"] <- "Very Poor"
+stss$Q14[stss$Q14=="4"] <- "Poor"
+stss$Q14[stss$Q14=="3"] <- "Okay"
+stss$Q14[stss$Q14=="2"] <- "Good"
+stss$Q14[stss$Q14=="1"] <- "Excellent"
+
+
+stss$Q31[stss$Q31=="5"] <- "Very Poor"
+stss$Q31[stss$Q31=="4"] <- "Poor"
+stss$Q31[stss$Q31=="3"] <- "Okay"
+stss$Q31[stss$Q31=="2"] <- "Good"
+stss$Q31[stss$Q31=="1"] <- "Excellent"
+
+
+
+stss$Q32_2_a[stss$Q32_2_a=="1"] <- "More likely"
+stss$Q32_2_a[stss$Q32_2_a=="2"] <- "About the same"
+stss$Q32_2_a[stss$Q32_2_a=="3"] <- "Less likely"
+stss$Q32_2_a[stss$Q32_2_a=="4"] <- "NA/Don't know"
+
+
+stss$Q32_1_a[stss$Q32_1_a=="1"] <- "More likely"
+stss$Q32_1_a[stss$Q32_1_a=="2"] <- "About the same"
+stss$Q32_1_a[stss$Q32_1_a=="3"] <- "Less likely"
+stss$Q32_1_a[stss$Q32_1_a=="4"] <- "NA/Don't know"
+
+
+
+#Question Response orders
+
+MLorder <- c("More likely","About the same","Less likely","NA/Don't know")
+EVorder <- c("Excellent","Good","Okay","Poor","Very Poor")
+
+
+#create standard dfs
+
+FreqB <- c(0,0,0,0,0)
+FreqC <- c(0,0,0,0)
+
+EVtable <- data.frame(EVorder,FreqB)
+MLtable <- data.frame(MLorder,FreqC)
+colnames(EVtable) <- c("Var1","FreqB")
+colnames(MLtable) <- c("Var1","FreqB")
+
+# How would you rate academic sessions (Main and Second subjects combined)
+
+a <- as.data.frame(table(stss$Q5))
+
+
+a <- merge(EVtable,
+              a[,c("Var1",
+                   "Freq")],
+              by="Var1",all.x=TRUE)
+
+a[is.na(a)] <- 0
+
+
+b <- as.data.frame(table(stss$Q6))
+
+b <- merge(EVtable,
+           b[,c("Var1",
+                "Freq")],
+           by="Var1",all.x=TRUE)
+
+b[is.na(b)] <- 0
+
+
+c <- a$Freq+b$Freq
+View(c)
+as.data.frame(c)
+c <- cbind(c,data.frame(c(EVorder)))
+colnames(c) <- c("Freq","Var1")
+
+c<-mutate(c,
+          pct=(Freq/sum(Freq))*100)
+
+c$pct <- round(c$pct,digits=1)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r c, echo = FALSE,fig.align='center'}
+text(barplot(c$pct, col = c("red","green","blue","purple","yellow"),ylim=c(0,100),
+        las=1,
+        border=NA,
+        names.arg=c$Var1),
+     c$pct,labels=paste0(c$pct,"%"),pos=3)
+     
+     
+```
+
+
